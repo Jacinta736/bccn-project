@@ -22,3 +22,15 @@ What the Doctor Does:
 What the Doctor Receives:
 - Receives the stego-image from the patient.
 - Extracts the hidden medical data using steganography decoding to obtain patient details and medical information.
+
+# Programming Languages
+### HTML, CSS, JavaScript
+- to create the webpage
+
+### Python
+- Socket- to transfer files
+- Pillow- for image manipulation
+- Flask- to connect webpage to python
+
+### MongoDB
+- Database- to store the image for future use
