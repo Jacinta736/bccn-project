@@ -4,7 +4,7 @@ BCCN group project using HTML, CSS, JavaScript, Python and MongoDB Atlas
 ### Primary Physician (in rural area)
 What the Physician Does:
 - Captures or uploads an image.
-- Inputs sensitive medical data (e.g., patient ID, history, symptoms, reports).
+- Inputs sensitive medical data.
 - Embeds the sensitive medical data inside the image using steganography.
 - Sends the stego-image across the hospital network.
 
