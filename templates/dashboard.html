@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+</head>
+<body>
+    <h2>Patient Dashboard</h2>
+    <a href="/new_patient">➕ Add New Patient</a>
+    <!-- 🔹 Search form -->
+    <form method="GET" action="{{ url_for('dashboard') }}">
+        <input type="text" name="name" placeholder="Search by name">
+        <button type="submit">Search</button>
+        <a href="{{ url_for('dashboard') }}"><button type="button">Clear</button></a>
+    </form>
+    <ul>
+        {% for patient in patients %}
+        <li>
+            <a href="/patient/{{ patient._id }}">{{ patient.name }} ({{ patient.age }} yrs)</a>
+            - {{ patient.doctor }} / {{ patient.specialty }}
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

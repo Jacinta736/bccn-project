@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>New Patient</title>
+</head>
+<body>
+    <h2>Add New Patient</h2>
+    <form method="POST" enctype="multipart/form-data">
+        <label>Date:</label><br>
+        <input type="date" name="date" required><br><br>
+
+        <label>Name:</label><br>
+        <input type="text" name="name" required><br><br>
+
+        <label>Age:</label><br>
+        <input type="number" name="age" required><br><br>
+
+        <label>Doctor:</label><br>
+        <input type="text" name="doctor" required><br><br>
+
+        <label>Specialty:</label><br>
+        <input type="text" name="specialty" required><br><br>
+
+        <label>Description:</label><br>
+        <textarea name="description"></textarea><br><br>
+
+        <label>Upload Image:</label><br>
+        <input type="file" name="image"><br><br>
+
+        <button type="submit">Save Patient</button><br><br>
+        <a href="/dashboard">⬅ Back to Dashboard</a>
+    </form>
+</body>
+</html>
