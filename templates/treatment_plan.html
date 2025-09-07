@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Treatment Plan</title>
+</head>
+<body>
+    <h2>Treatment Plan for {{ patient.name }}</h2>
+
+    <p><b>Age:</b> {{ patient.age }}</p>
+    <p><b>Doctor:</b> {{ patient.doctor }}</p>
+    <p><b>Specialty:</b> {{ patient.specialty }}</p>
+    <p><b>Description:</b> {{ patient.description }}</p>
+
+    <h3>Current Treatment Plan</h3>
+    <p>{{ patient.treatment_plan or "Not added yet" }}</p>
+
+    <h3>Medication</h3>
+    <p>{{ patient.medication or "Not added yet" }}</p>
+
+    <h3>Comments</h3>
+    <ul>
+        {% for comment in patient.comments %}
+        <li>[{{ comment.date }}] {{ comment.comment }}</li>
+        {% endfor %}
+    </ul>
+
+    <h3>Add New Treatment / Comment</h3>
+    <form method="POST" enctype="multipart/form-data">
+        <label>Upload Treatment Image:</label><br>
+        <input type="file" name="treatment_image"><br><br>
+
+        <label>Add Comment:</label><br>
+        <textarea name="comment"></textarea><br><br>
+
+        <button type="submit">Update</button>
+    </form>
+
+    <p><a href="/dashboard">⬅ Back to Dashboard</a></p>
+</body>
+</html>
