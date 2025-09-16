@@ -3,11 +3,11 @@ from pymongo import MongoClient
 import os
 from datetime import datetime
 from bson.objectid import ObjectId
-#import pytesseract
 import pytesseract
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-
 from PIL import Image
+from encode_rural import encode_image
+import gridfs, io
 
 app = Flask(__name__)
 
@@ -16,6 +16,7 @@ MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
 client = MongoClient(MONGO_URI)
 db = client["healthcare"]
 patients = db["patients"]
+fs = gridfs.GridFS(db)
 
 UPLOAD_FOLDER = "static/uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -54,6 +55,7 @@ def new_patient():
     if request.method == "POST":
         image_file = request.files["image"]
         image_filename = None
+        gridfs_id = None
         if image_file:
             image_path = os.path.join(UPLOAD_FOLDER, image_file.filename)
             image_file.save(image_path)
@@ -71,7 +73,28 @@ def new_patient():
             "medication": None,
             "comments": []  # store multiple comments
         }
-        patients.insert_one(patient_data)
+
+        if image_filename:
+            from PIL import Image
+            img = Image.open(image_path)
+            message = f"Name: {patient_data['name']}, Age: {patient_data['age']}, Doctor: {patient_data['doctor']}, Specialty: {patient_data['specialty']}, Desc: {patient_data['description']}"
+            encoded_img = encode_image(img, message)
+
+            img_io = io.BytesIO()
+            encoded_img.save(img_io, "PNG")
+            img_io.seek(0)
+
+            # Save in GridFS with metadata
+            gridfs_id = fs.put(img_io, filename=f"{patient_data['name']}_encoded.png", metadata=patient_data)
+
+            # Store GridFS id reference in patient document
+            patient_data["gridfs_id"] = str(gridfs_id)
+            # Save encoded image to disk
+            os.makedirs("static/uploads/encoded", exist_ok=True)
+            with open(f"static/uploads/encoded/{patient_data['name']}_encoded.png", "wb") as f:
+                f.write(img_io.getbuffer())
+
+        inserted=patients.insert_one(patient_data)
         return redirect(url_for("dashboard"))
     return render_template("new_patient.html")
 
