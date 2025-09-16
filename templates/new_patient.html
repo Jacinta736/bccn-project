@@ -2,33 +2,145 @@
 <html>
 <head>
     <title>New Patient</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        input[type="file"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        textarea:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        textarea {
+            height: 80px;
+            resize: vertical;
+        }
+
+        input[type="file"] {
+            padding: 8px;
+            background-color: #f8f9fa;
+            border: 2px dashed #ddd;
+            cursor: pointer;
+        }
+
+        input[type="file"]:hover {
+            border-color: #007bff;
+            background-color: #e9ecef;
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            margin-right: 10px;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: #6c757d;
+            text-decoration: none;
+            padding: 12px 20px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            margin-top: 20px;
+            transition: all 0.2s;
+        }
+
+        .back-link:hover {
+            background-color: #f8f9fa;
+            border-color: #6c757d;
+            text-decoration: none;
+        }
+
+        .form-actions {
+            margin-top: 30px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-    <h2>Add New Patient</h2>
-    <form method="POST" enctype="multipart/form-data">
-        <label>Date:</label><br>
-        <input type="date" name="date" required><br><br>
+    <div class="form-container">
+        <h2>Add New Patient</h2>
+        <form method="POST" enctype="multipart/form-data">
+            <label>Date:</label><br>
+            <input type="date" name="date" required><br><br>
 
-        <label>Name:</label><br>
-        <input type="text" name="name" required><br><br>
+            <label>Name:</label><br>
+            <input type="text" name="name" required><br><br>
 
-        <label>Age:</label><br>
-        <input type="number" name="age" required><br><br>
+            <label>Age:</label><br>
+            <input type="number" name="age" required><br><br>
 
-        <label>Doctor:</label><br>
-        <input type="text" name="doctor" required><br><br>
+            <label>Doctor:</label><br>
+            <input type="text" name="doctor" required><br><br>
 
-        <label>Specialty:</label><br>
-        <input type="text" name="specialty" required><br><br>
+            <label>Specialty:</label><br>
+            <input type="text" name="specialty" required><br><br>
 
-        <label>Description:</label><br>
-        <textarea name="description"></textarea><br><br>
+            <label>Description:</label><br>
+            <textarea name="description"></textarea><br><br>
 
-        <label>Upload Image:</label><br>
-        <input type="file" name="image"><br><br>
+            <label>Upload Image:</label><br>
+            <input type="file" name="image"><br><br>
 
-        <button type="submit">Save Patient</button><br><br>
-        <a href="/dashboard">⬅ Back to Dashboard</a>
-    </form>
+            <button type="submit">Save Patient</button><br><br>
+            <a href="/dashboard">⬅ Back to Dashboard</a>
+        </form>
+    </div>
 </body>
 </html>
