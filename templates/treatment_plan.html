@@ -2,39 +2,222 @@
 <html>
 <head>
     <title>Treatment Plan</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .treatment-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #555;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #007bff;
+        }
+
+        /* Patient Info Section */
+        .patient-info {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 25px;
+        }
+
+        .patient-info p {
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .patient-info b {
+            color: #333;
+            font-weight: bold;
+        }
+
+        /* Treatment/Medication Content */
+        .content-section {
+            background-color: #fff;
+            padding: 15px;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            min-height: 40px;
+        }
+
+        .content-section p {
+            margin: 0;
+            color: #666;
+            font-style: italic;
+        }
+
+        /* Comments Section */
+        .comments-section {
+            margin-bottom: 30px;
+        }
+
+        .comments-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .comments-section li {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-left: 4px solid #28a745;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .comment-date {
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        /* Form Section */
+        .form-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 30px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        input[type="file"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+        }
+
+        input[type="file"] {
+            background-color: #fff;
+            border: 2px dashed #ddd;
+            cursor: pointer;
+            padding: 15px;
+        }
+
+        input[type="file"]:hover {
+            border-color: #007bff;
+            background-color: #f8f9fa;
+        }
+
+        textarea {
+            height: 80px;
+            resize: vertical;
+        }
+
+        textarea:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Back Link */
+        .back-link {
+            display: inline-block;
+            color: #6c757d;
+            text-decoration: none;
+            padding: 12px 20px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            margin-top: 30px;
+            transition: all 0.2s;
+        }
+
+        .back-link:hover {
+            background-color: #f8f9fa;
+            border-color: #6c757d;
+            text-decoration: none;
+        }
+
+        /* Empty state styling */
+        .empty-state {
+            color: #999;
+            font-style: italic;
+        }
+    </style>
 </head>
 <body>
-    <h2>Treatment Plan for {{ patient.name }}</h2>
+    <div class="treatment-container">
+        <h2>Treatment Plan for {{ patient.name }}</h2>
 
-    <p><b>Age:</b> {{ patient.age }}</p>
-    <p><b>Doctor:</b> {{ patient.doctor }}</p>
-    <p><b>Specialty:</b> {{ patient.specialty }}</p>
-    <p><b>Description:</b> {{ patient.description }}</p>
+        <p><b>Age:</b> {{ patient.age }}</p>
+        <p><b>Doctor:</b> {{ patient.doctor }}</p>
+        <p><b>Specialty:</b> {{ patient.specialty }}</p>
+        <p><b>Description:</b> {{ patient.description }}</p>
 
-    <h3>Current Treatment Plan</h3>
-    <p>{{ patient.treatment_plan or "Not added yet" }}</p>
+        <h3>Current Treatment Plan</h3>
+        <p>{{ patient.treatment_plan or "Not added yet" }}</p>
 
-    <h3>Medication</h3>
-    <p>{{ patient.medication or "Not added yet" }}</p>
+        <h3>Medication</h3>
+        <p>{{ patient.medication or "Not added yet" }}</p>
 
-    <h3>Comments</h3>
-    <ul>
-        {% for comment in patient.comments %}
-        <li>[{{ comment.date }}] {{ comment.comment }}</li>
-        {% endfor %}
-    </ul>
+        <h3>Comments</h3>
+        <ul>
+            {% for comment in patient.comments %}
+            <li>[{{ comment.date }}] {{ comment.comment }}</li>
+            {% endfor %}
+        </ul>
 
-    <h3>Add New Treatment / Comment</h3>
-    <form method="POST" enctype="multipart/form-data">
-        <label>Upload Treatment Image:</label><br>
-        <input type="file" name="treatment_image"><br><br>
+        <h3>Add New Treatment / Comment</h3>
+        <form method="POST" enctype="multipart/form-data">
+            <label>Upload Treatment Image:</label><br>
+            <input type="file" name="treatment_image"><br><br>
 
-        <label>Add Comment:</label><br>
-        <textarea name="comment"></textarea><br><br>
+            <label>Add Comment:</label><br>
+           <textarea name="comment"></textarea><br><br>
 
-        <button type="submit">Update</button>
-    </form>
+           <button type="submit">Update</button>
+        </form>
 
-    <p><a href="/dashboard">⬅ Back to Dashboard</a></p>
+        <p><a href="/dashboard">⬅ Back to Dashboard</a></p>
+    </div>
 </body>
 </html>
