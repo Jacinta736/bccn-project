@@ -9,7 +9,6 @@ from PIL import Image
 from encode_rural import encode_image
 import gridfs, io
 
-
 app = Flask(__name__)
 
 # MongoDB connection (local by default, can be replaced with Atlas URI)
@@ -17,6 +16,7 @@ MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
 client = MongoClient(MONGO_URI)
 db = client["healthcare"]
 patients = db["patients"]
+fs = gridfs.GridFS(db)
 
 UPLOAD_FOLDER = "static/uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -89,8 +89,12 @@ def new_patient():
 
             # Store GridFS id reference in patient document
             patient_data["gridfs_id"] = str(gridfs_id)
+            # Save encoded image to disk
+            os.makedirs("static/uploads/encoded", exist_ok=True)
+            with open(f"static/uploads/encoded/{patient_data['name']}_encoded.png", "wb") as f:
+                f.write(img_io.getbuffer())
 
-        patients.insert_one(patient_data)
+        inserted=patients.insert_one(patient_data)
         return redirect(url_for("dashboard"))
     return render_template("new_patient.html")
 
