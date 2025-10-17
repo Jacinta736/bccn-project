@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Doctor Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f8f5;
+            margin: 0;
+            padding: 20px;
+        }
+        h2 {
+            color: #2c662d;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .patient-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 600px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .patient-card h3 {
+            color: #2c662d;
+            margin-top: 0;
+        }
+        .patient-card p {
+            margin: 5px 0;
+            color: #333;
+        }
+        a {
+            display: inline-block;
+            margin: 10px 10px 10px 0;
+            padding: 12px 20px;
+            text-decoration: none;
+            background: #2e8b57;
+            color: white;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+        a:hover {
+            background: #256f46;
+        }
+        .no-patients {
+            text-align: center;
+            color: #666;
+            margin-top: 50px;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid #ddd;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h2>Welcome Doctor - Patient Dashboard</h2>
+    
+    {% if patients %}
+        {% for patient in patients %}
+        <div class="patient-card">
+            <h3>{{ patient.name or 'Unknown Patient' }}</h3>
+            <p><strong>Age:</strong> {{ patient.age or 'N/A' }}</p>
+            <p><strong>Doctor:</strong> {{ patient.doctor or 'N/A' }}</p>
+            <p><strong>Speciality:</strong> {{ patient.speciality or 'N/A' }}</p>
+            <p><strong>Description:</strong> {{ patient.description or patient.decoded_data or 'N/A' }}</p>
+            
+            <div style="margin-top: 15px;">
+                <a href="{{ url_for('view_patient', id=patient['_id']) }}">
+                    Check Patient Details
+                </a>
+                <a href="{{ url_for('treatment', id=patient['_id']) }}">
+                    Treatment Plan
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="no-patients">
+            <p>No patients found. Please ensure the rural center has sent patient data.</p>
+        </div>
+    {% endif %}
+</body>
+</html>

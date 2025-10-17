@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Treatment Plan</title>
+    <style>
+        body { font-family: Arial; background: #f2f2f2; text-align: center; }
+        table { margin: 20px auto; border-collapse: collapse; width: 80%; }
+        th, td { border: 1px solid black; padding: 10px; }
+        th { background: lightgray; }
+    </style>
+</head>
+<body>
+    <h2>Patient Treatment Plans</h2>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Doctor</th>
+            <th>Speciality</th>
+            <th>Description</th>
+        </tr>
+        {% for patient in patients %}
+        <tr>
+            <td>{{ patient.name }}</td>
+            <td>{{ patient.age }}</td>
+            <td>{{ patient.doctor }}</td>
+            <td>{{ patient.speciality }}</td>
+            <td>{{ patient.description }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
