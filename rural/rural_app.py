@@ -7,24 +7,47 @@ import pytesseract
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 from PIL import Image
 from encode_rural import encode_image
-import gridfs, io
+import gridfs, io, socket
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates', static_folder='uploads')
 
-# MongoDB connection (local by default, can be replaced with Atlas URI)
+# MongoDB connection
 MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
 client = MongoClient(MONGO_URI)
 db = client["healthcare"]
 patients = db["patients"]
 fs = gridfs.GridFS(db)
 
-UPLOAD_FOLDER = "static/uploads"
+UPLOAD_FOLDER = "rural/uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Dummy login credentials
 users = {"doctor": "password123"}
 
+# Socket config (for sending encoded image to hospital)
+HOSPITAL_HOST = "127.0.0.1"
+HOSPITAL_PORT = 12346  # Hospital receiver port
 
+# ---------------- Socket Helper ----------------
+def send_image_to_hospital(image_path):
+    """Send encoded image to hospital via socket"""
+    try:
+        s = socket.socket()
+        s.connect((HOSPITAL_HOST, HOSPITAL_PORT))
+
+        with open(image_path, "rb") as f:
+            while True:
+                data = f.read(1024)
+                if not data:
+                    break
+                s.send(data)
+        s.close()
+        print(f"✅ Image sent to hospital at {HOSPITAL_HOST}:{HOSPITAL_PORT}")
+        return True
+    except Exception as e:
+        print(f"❌ Error sending image: {e}")
+        return False
+    
 # ---------------- Routes ---------------- #
 
 @app.route("/", methods=["GET", "POST"])
@@ -41,9 +64,8 @@ def login():
 
 @app.route("/dashboard", methods=["GET"])
 def dashboard():
-    name_query = request.args.get("name")  # Get search input from form
+    name_query = request.args.get("name")
     if name_query:
-        # Case-insensitive search for partial matches
         all_patients = patients.find({"name": {"$regex": name_query, "$options": "i"}})
     else:
         all_patients = patients.find()
@@ -53,14 +75,10 @@ def dashboard():
 @app.route("/new_patient", methods=["GET", "POST"])
 def new_patient():
     if request.method == "POST":
-        image_file = request.files["image"]
+        image_file = request.files.get("image")
         image_filename = None
         gridfs_id = None
-        if image_file:
-            image_path = os.path.join(UPLOAD_FOLDER, image_file.filename)
-            image_file.save(image_path)
-            image_filename = image_file.filename
-
+        
         patient_data = {
             "date": request.form["date"],
             "name": request.form["name"],
@@ -68,34 +86,55 @@ def new_patient():
             "doctor": request.form["doctor"],
             "specialty": request.form["specialty"],
             "description": request.form["description"],
-            "image": image_filename,
+            "image": None,
             "treatment_plan": None,
             "medication": None,
-            "comments": []  # store multiple comments
+            "comments": [],
+            "gridfs_id": None
         }
 
-        if image_filename:
-            from PIL import Image
+        if image_file:
+            # Save original image
+            image_path = os.path.join(UPLOAD_FOLDER, image_file.filename)
+            image_file.save(image_path)
+            
+            # Create message to encode
             img = Image.open(image_path)
-            message = f"Name: {patient_data['name']}, Age: {patient_data['age']}, Doctor: {patient_data['doctor']}, Specialty: {patient_data['specialty']}, Desc: {patient_data['description']}"
+            message = f"Name:{patient_data['name']}|Age:{patient_data['age']}|Doctor:{patient_data['doctor']}|Specialty:{patient_data['specialty']}|Description:{patient_data['description']}"
+            
+            # Encode message into image
             encoded_img = encode_image(img, message)
 
+            # Save encoded image to BytesIO
             img_io = io.BytesIO()
             encoded_img.save(img_io, "PNG")
             img_io.seek(0)
 
-            # Save in GridFS with metadata
-            gridfs_id = fs.put(img_io, filename=f"{patient_data['name']}_encoded.png", metadata=patient_data)
-
-            # Store GridFS id reference in patient document
+            # Save in GridFS
+            gridfs_id = fs.put(img_io, filename=f"{patient_data['name']}_encoded.png")
             patient_data["gridfs_id"] = str(gridfs_id)
-            # Save encoded image to disk
-            os.makedirs("static/uploads/encoded", exist_ok=True)
-            with open(f"static/uploads/encoded/{patient_data['name']}_encoded.png", "wb") as f:
+            patient_data["image"] = f"{patient_data['name']}_encoded.png"
+
+            # Save encoded image to disk for socket transmission
+            encoded_path = os.path.join(UPLOAD_FOLDER, f"{patient_data['name']}_encoded.png")
+            img_io.seek(0)
+            with open(encoded_path, "wb") as f:
                 f.write(img_io.getbuffer())
 
-        inserted=patients.insert_one(patient_data)
+            # Send encoded image to hospital
+            print(f"Attempting to send image to hospital...")
+            success = send_image_to_hospital(encoded_path)
+            if success:
+                print("✅ Image successfully sent to hospital")
+            else:
+                print("❌ Failed to send image to hospital")
+
+        # Insert patient record
+        inserted = patients.insert_one(patient_data)
+        print(f"✅ Patient {patient_data['name']} created with ID: {inserted.inserted_id}")
+        
         return redirect(url_for("dashboard"))
+    
     return render_template("new_patient.html")
 
 
@@ -113,7 +152,7 @@ def treatment_plan(patient_id):
             # OCR to extract text
             extracted_text = pytesseract.image_to_string(Image.open(image_path))
 
-        # Doctor’s comments
+        # Doctor's comments
         comment_text = request.form.get("comment")
         comment_entry = {
             "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
@@ -122,7 +161,7 @@ def treatment_plan(patient_id):
 
         update_data = {}
         if extracted_text:
-            # simple assumption: split extracted text
+            # Parse extracted text
             parts = extracted_text.split("\n")
             update_data["treatment_plan"] = parts[0] if len(parts) > 0 else ""
             update_data["medication"] = parts[1] if len(parts) > 1 else ""
@@ -146,4 +185,4 @@ def treatment_plan(patient_id):
 
 # ---------------- Run App ---------------- #
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
