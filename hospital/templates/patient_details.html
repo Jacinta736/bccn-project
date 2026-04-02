@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Patient Details</title>
+</head>
+<body>
+    <h2>Patient Details</h2>
+    <p><strong>Decoded Data:</strong> {{ patient.decoded_data }}</p>
+    <p><strong>Image:</strong></p>
+    <img src="{{ url_for('get_image', id=patient._id) }}" alt="Patient Image" style="max-width:500px;">
+
+    <h3>Update Treatment & Medication</h3>
+    <form method="POST">
+        <label>Treatment Plan:</label><br>
+        <textarea name="treatment" rows="3" cols="50">{{ patient.treatment_plan or '' }}</textarea><br><br>
+
+        <label>Medication:</label><br>
+        <textarea name="medication" rows="2" cols="50">{{ patient.medication or '' }}</textarea><br><br>
+
+        <button type="submit">Send to Rural</button>
+    </form>
+
+    <br>
+    <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+</body>
+</html>

@@ -34,3 +34,4 @@ What the Doctor Receives:
 
 ### MongoDB
 - Database- to store the image for future use
+- Atlas it used so that we can all access the databases
